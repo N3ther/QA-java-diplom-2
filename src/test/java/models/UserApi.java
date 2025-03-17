@@ -1,36 +1,44 @@
 package models;
 
-import io.restassured.RestAssured;
+
+import config.RestClient;
+import io.qameta.allure.Step;
 import io.restassured.response.Response;
 
+import static io.restassured.RestAssured.given;
+
 public class UserApi {
-    private static final String BASE_URL = "https://stellarburgers.nomoreparties.site/api/auth/";
 
+    @Step("Регистрация пользователя: email={user.email}, имя={user.name}")
     public Response registerUser(UserModel user) {
-        return RestAssured.given()
-                .contentType("application/json")
+        return given()
+                .spec(RestClient.getBaseSpec())
                 .body(user)
-                .post(BASE_URL + "register");
+                .post("auth/register");
     }
 
+    @Step("Авторизация пользователя: email={user.email}")
     public Response loginUser(UserModel user) {
-        return RestAssured.given()
-                .contentType("application/json")
+        return given()
+                .spec(RestClient.getBaseSpec())
                 .body(user)
-                .post(BASE_URL + "login");
+                .post("auth/login");
     }
 
+    @Step("Обновление данных пользователя")
     public Response updateUser(String token, UserModel user) {
-        return RestAssured.given()
-                .contentType("application/json")
-                .auth().oauth2(token)
+        return given()
+                .spec(RestClient.getBaseSpec())
+                .header("Authorization", token)
                 .body(user)
-                .patch(BASE_URL + "user");
+                .patch("auth/user");
     }
 
+    @Step("Удаление пользователя")
     public Response deleteUser(String token) {
-        return RestAssured.given()
-                .auth().oauth2(token)
-                .delete(BASE_URL + "user");
+        return given()
+                .spec(RestClient.getBaseSpec())
+                .header("Authorization", token)
+                .delete("auth/user");
     }
 }

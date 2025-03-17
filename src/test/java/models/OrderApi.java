@@ -1,33 +1,40 @@
 package models;
 
-import io.restassured.RestAssured;
+
+import config.RestClient;
+import io.qameta.allure.Step;
 import io.restassured.response.Response;
 
+import static io.restassured.RestAssured.given;
+
 public class OrderApi {
-    private static final String BASE_URL = "https://stellarburgers.nomoreparties.site/api/auth/";
-    private String accessToken;
+    private final String accessToken;
 
     public OrderApi(String accessToken) {
-        this.accessToken = accessToken;
+        this.accessToken = accessToken != null ? accessToken : "";
     }
 
+    @Step("Получение списка ингредиентов")
+    public Response getIngredients() {
+        return given()
+                .spec(RestClient.getBaseSpec())
+                .get("ingredients");
+    }
+
+    @Step("Создание заказа с ингредиентами: {order.ingredients}")
     public Response createOrder(OrderModel order) {
-        return RestAssured.given()
-                .header("Authorization", accessToken)
-                .contentType("application/json")
-                .body(order.toJson())
-                .post(BASE_URL + "/orders");
+        return given()
+                .spec(RestClient.getBaseSpec())
+                .header("Authorization", this.accessToken)
+                .body(order)
+                .post("orders");
     }
 
+    @Step("Получение заказов пользователя")
     public Response getUserOrders() {
-        return RestAssured.given()
-                .header("Authorization", accessToken)
-                .get(BASE_URL + "/orders/user");
-    }
-
-    public Response deleteOrder(String orderId) {
-        return RestAssured.given()
-                .header("Authorization", accessToken)
-                .delete(BASE_URL + "/" + orderId);
+        return given()
+                .spec(RestClient.getBaseSpec())
+                .header("Authorization", this.accessToken)
+                .get("orders");
     }
 }

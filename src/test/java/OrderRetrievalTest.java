@@ -1,4 +1,6 @@
 import com.github.javafaker.Faker;
+import io.qameta.allure.Description;
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
 import models.OrderApi;
 import models.UserApi;
@@ -37,6 +39,8 @@ public class OrderRetrievalTest {
     }
 
     @Test
+    @DisplayName("Получение заказов пользователя с авторизацией")
+    @Description("Проверка успешного получения заказов пользователя при наличии авторизации")
     public void testGetUserOrdersAuthorized() {
         Response response = orderApi.getUserOrders();
         assertEquals(200, response.getStatusCode());
@@ -44,6 +48,8 @@ public class OrderRetrievalTest {
     }
 
     @Test
+    @DisplayName("Получение заказов пользователя без авторизации")
+    @Description("Проверка, что получение заказов без авторизации возвращает ошибку 401")
     public void testGetUserOrdersUnauthorized() {
         OrderApi unauthorizedApi = new OrderApi(null);
         Response response = unauthorizedApi.getUserOrders();

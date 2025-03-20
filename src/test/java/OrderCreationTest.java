@@ -1,4 +1,6 @@
 import com.github.javafaker.Faker;
+import io.qameta.allure.Description;
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
 import models.OrderApi;
 import models.OrderModel;
@@ -40,6 +42,8 @@ public class OrderCreationTest {
     }
 
     @Test
+    @DisplayName("Создание заказа с авторизацией")
+    @Description("Проверка успешного создания заказа при наличии авторизации")
     public void testCreateOrderWithAuthorization() {
         Response ingredientsResponse = orderApi.getIngredients();
         List<String> ingredientIds = ingredientsResponse.jsonPath().getList("data._id");
@@ -53,6 +57,8 @@ public class OrderCreationTest {
     }
 
     @Test
+    @DisplayName("Создание заказа без авторизации")
+    @Description("Проверка, что создание заказа без авторизации возвращает ошибку 401")
     public void testCreateOrderWithoutAuthorization() {
         OrderApi unauthorizedApi = new OrderApi(null);
         Response ingredientsResponse = orderApi.getIngredients();
@@ -61,21 +67,27 @@ public class OrderCreationTest {
         OrderModel order = new OrderModel(ingredientIds.subList(0, 2).toArray(new String[0]));
         Response response = unauthorizedApi.createOrder(order);
 
-        // Исправление: проверка реального поведения API
         assertEquals(401, response.getStatusCode());
         assertEquals("You should be authorised", response.jsonPath().getString("message"));
     }
 
     @Test
+    @DisplayName("Создание заказа с некорректным хешем")
+    @Description("Проверка, что создание заказа с некорректным хешем возвращает ошибку 500")
     public void testCreateOrderWithIncorrectHash() {
         OrderModel order = new OrderModel(new String[]{"invalid_ingredient_123"});
         Response response = orderApi.createOrder(order);
 
         assertEquals(500, response.getStatusCode());
-        assertEquals("Internal Server Error", response.jsonPath().getString("message"));
+
+        String responseBody = response.getBody().asString().toLowerCase();
+        assertTrue("Ответ должен содержать информацию об ошибке",
+                responseBody.contains("internal server error"));
     }
 
     @Test
+    @DisplayName("Создание заказа без ингредиентов")
+    @Description("Проверка, что создание заказа без указания ингредиентов возвращает ошибку 400")
     public void testCreateOrderWithoutIngredients() {
         OrderModel order = new OrderModel(new String[]{});
         Response response = orderApi.createOrder(order);

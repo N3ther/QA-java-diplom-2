@@ -1,4 +1,6 @@
 import com.github.javafaker.Faker;
+import io.qameta.allure.Description;
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
 import models.UserApi;
 import models.UserModel;
@@ -35,6 +37,8 @@ public class UserProfileTest {
     }
 
     @Test
+    @DisplayName("Обновление имени пользователя с авторизацией")
+    @Description("Проверка успешного обновления имени пользователя при наличии авторизации")
     public void testUpdateUserNameWithAuthorization() {
         UserModel updatedUser = new UserModel(
                 testUser.getEmail(),
@@ -48,22 +52,26 @@ public class UserProfileTest {
     }
 
     @Test
+    @DisplayName("Обновление email пользователя с авторизацией")
+    @Description("Проверка успешного обновления email пользователя при наличии авторизации")
     public void testUpdateUserEmailWithAuthorization() {
         // Обновление токена перед запросом
         String freshToken = userApi.loginUser(testUser).jsonPath().getString("accessToken");
 
         UserModel updatedUser = new UserModel(
-                "new-email@test.com",
+                "newemailpinki@test.com",
                 testUser.getPassword(),
                 testUser.getName()
         );
 
         Response response = userApi.updateUser(freshToken, updatedUser);
         assertEquals(200, response.getStatusCode());
-        assertEquals("new-email@test.com", response.jsonPath().getString("user.email"));
+        assertEquals("newemailpinki@test.com", response.jsonPath().getString("user.email"));
     }
 
     @Test
+    @DisplayName("Обновление пользователя без авторизации")
+    @Description("Проверка, что обновление пользователя без авторизации возвращает ошибку 401")
     public void testUpdateUserWithoutAuthorization() {
         UserModel updatedUser = new UserModel("new@test.com", "pass", "Name");
         Response response = userApi.updateUser("", updatedUser);

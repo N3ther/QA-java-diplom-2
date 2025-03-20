@@ -1,4 +1,6 @@
 import com.github.javafaker.Faker;
+import io.qameta.allure.Description;
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
 import models.UserApi;
 import models.UserModel;
@@ -24,6 +26,8 @@ public class UserLoginTest {
     }
 
     @Test
+    @DisplayName("Вход с валидными данными пользователя")
+    @Description("Проверка успешного входа с валидными данными пользователя")
     public void testLoginWithValidUser() {
         Response response = userApi.loginUser(testUser);
         assertEquals(200, response.getStatusCode());
@@ -31,6 +35,8 @@ public class UserLoginTest {
     }
 
     @Test
+    @DisplayName("Вход с невалидным email")
+    @Description("Проверка, что вход с невалидным email возвращает ошибку 401")
     public void testLoginWithInvalidEmail() {
         UserModel invalidUser = new UserModel(
                 "invalid@test.com",
@@ -44,6 +50,8 @@ public class UserLoginTest {
     }
 
     @Test
+    @DisplayName("Вход с невалидным паролем")
+    @Description("Проверка, что вход с невалидным паролем возвращает ошибку 401")
     public void testLoginWithInvalidPassword() {
         UserModel invalidUser = new UserModel(
                 testUser.getEmail(),

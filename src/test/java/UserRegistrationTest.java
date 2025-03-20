@@ -1,4 +1,6 @@
 import com.github.javafaker.Faker;
+import io.qameta.allure.Description;
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
 import models.UserApi;
 import models.UserModel;
@@ -26,6 +28,8 @@ public class UserRegistrationTest {
     }
 
     @Test
+    @DisplayName("Создание уникального пользователя")
+    @Description("Проверка успешного создания уникального пользователя")
     public void testCreateUniqueUser() {
         UserModel user = new UserModel(
                 faker.internet().emailAddress(),
@@ -40,6 +44,8 @@ public class UserRegistrationTest {
     }
 
     @Test
+    @DisplayName("Создание существующего пользователя")
+    @Description("Проверка, что создание уже существующего пользователя возвращает ошибку 403")
     public void testCreateExistingUser() {
         UserModel existingUser = new UserModel(
                 "existing@test.com",
@@ -54,6 +60,8 @@ public class UserRegistrationTest {
     }
 
     @Test
+    @DisplayName("Создание пользователя без имени")
+    @Description("Проверка, что создание пользователя без имени возвращает ошибку 403")
     public void testCreateUserWithoutName() {
         UserModel user = new UserModel("no-name@test.com", "password", null);
         Response response = userApi.registerUser(user);
@@ -63,6 +71,8 @@ public class UserRegistrationTest {
     }
 
     @Test
+    @DisplayName("Создание пользователя без email")
+    @Description("Проверка, что создание пользователя без email возвращает ошибку 403")
     public void testCreateUserWithoutEmail() {
         UserModel user = new UserModel(null, "password", "Username");
         Response response = userApi.registerUser(user);
@@ -72,6 +82,8 @@ public class UserRegistrationTest {
     }
 
     @Test
+    @DisplayName("Создание пользователя без пароля")
+    @Description("Проверка, что создание пользователя без пароля возвращает ошибку 403")
     public void testCreateUserWithoutPassword() {
         UserModel user = new UserModel("no-pass@test.com", null, "Username");
         Response response = userApi.registerUser(user);
